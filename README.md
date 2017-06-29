@@ -1,9 +1,9 @@
 # manageiq-develop
 
 ## Develop env requirement
-Ubuntu 17
-RAM 8G
-CPU 4core
+* Ubuntu 17 
+* RAM 8G
+* CPU 4core
 
 ## Develop environmnet create
 
@@ -23,6 +23,33 @@ sudo apt install libgit2-dev pkg-config libtool
 sudo apt install libssl1.0-dev                    # for puma < 3.7.0
 
 ```
+* Install the Bower and Yarn package manager
+```
+sudo npm install -g npm
+sudo npm install -g bower yarn
+```
+* Install the Gulp and Webpack build system
+```
+sudo npm install -g gulp-cli
+sudo npm install -g webpack
+```
+
+* Enable Memcached
+```
+sudo systemctl enable memcached
+sudo systemctl start memcached
+```
+* Configure PostgreSQL
+```
+sudo grep -q '^local\s' /etc/postgresql/`9.6`/main/pg_hba.conf || echo "local all all trust" | sudo tee -a /etc/postgresql/`9.6`/main/pg_hba.conf
+sudo sed -i.bak 's/\(^local\s*\w*\s*\w*\s*\)\(peer$\)/\1trust/' /etc/postgresql/`9.6`/main/pg_hba.conf
+sudo systemctl restart postgresql
+sudo su postgres -c "psql -c \"CREATE ROLE root SUPERUSER LOGIN PASSWORD 'smartvm'\""
+```
+```
+note
+posgresql version check
+```
 
 * install rvm
 ```
@@ -34,7 +61,6 @@ sudo apt-get install rvm
 note
 check the dns config when start install
 need relogin and source rvm.sh
-
 ```
 
 * install ruby
@@ -58,3 +84,23 @@ check the folder ~/.config/configestore not root
 rake evm:start
 rake evm:stop
 ```
+* login
+```
+http://ip:3000
+admin /smartvm
+```
+
+## Develop other pluin eg. manageiq-provider-openstack
+
+* prepare the repo
+We use the plugins folder to put the plugins
+```
+mkdir /path/to/manageiq/plugins
+cd plugins
+git clone plugs
+```
+* create Gemfile.dev.rb in bundle.d
+```
+override_gem 'manageiq-provider-openstack', :path => File.expand_path("../plugins/manageiq-provider-openstack")
+```
+
